@@ -12,8 +12,8 @@ spacing (a tuple of floats)."""
 def write_nifti(data, spacing, file_path):
    """ takes the pixel data (anything that can be converted into a numpy array), the voxel
 spacing (a sequence of floats), and a file path (a string). Raise a ValueError when the arguments to write_nifti() are incompatible."""
-   data = np.asarray(data)
-   spacing = tuple(spacing)
-
    if len(spacing) != data.ndim:
        raise ValueError("The arguments to write_nifti() are incompatible.")
+
+   img = nib.Nifti1Image(data, spacing) #making and saving the nifti image
+   nib.save(img, file_path)
