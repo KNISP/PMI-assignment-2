@@ -1,9 +1,6 @@
-# Add a function test() that takes a file path (a string) to a DICOM file or directory with DICOM files and executes all
-# functions above.
-
 from dicom import read_dicom
 from conversion import dicom_to_nifti
-from nifti import read_nifti, write_nifti
+from nifti import read_nifti
 
 def test(dicom_path, nifti_path):
     """Test the DICOM to Nifti conversion process."""

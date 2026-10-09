@@ -1,5 +1,6 @@
 import nibabel as nib
 import numpy as np
+
 def read_nifti(file_path):
     """takes a file path (a string) and returns the pixel data (a NumPy array) and the voxel
 spacing (a tuple of floats)."""
