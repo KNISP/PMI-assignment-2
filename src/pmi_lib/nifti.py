@@ -1,5 +1,5 @@
+import os
 import nibabel as nib
-import numpy as np
 
 def read_nifti(file_path):
     """takes a file path (a string) and returns the pixel data (a NumPy array) and the voxel
@@ -13,6 +13,9 @@ spacing (a tuple of floats)."""
 def write_nifti(data, spacing, file_path):
    """ takes the pixel data (anything that can be converted into a numpy array), the voxel
 spacing (a sequence of floats), and a file path (a string). Raise a ValueError when the arguments to write_nifti() are incompatible."""
+   if not os.path.exists(file_path):
+           raise FileNotFoundError(f"The file or directory {file_path} does not exist.")
+   
    if len(spacing) != data.ndim:
        raise ValueError("The arguments to write_nifti() are incompatible.")
 

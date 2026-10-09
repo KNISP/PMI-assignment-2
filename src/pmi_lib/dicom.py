@@ -29,7 +29,10 @@ def _get_spacing(dicom_list):
 def read_dicom(file_path):
     # Check if file_path is a directory. If it is, then iterate over the directory and create a 3d volume.
     # If it is not a directory, then open the file as usual.
-    if os.path.isdir(file_path):
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file or directory {file_path} does not exist.")
+    elif os.path.isdir(file_path):
         # Read all DICOM files.
         dicom_images = []
         for file_name in os.listdir(file_path):
@@ -38,10 +41,10 @@ def read_dicom(file_path):
                 dicom_images.append(dcmread(full_path))  # Read the image.
 
         # Sort the files on the Instance Number.
-        sorted_images = sorted(dicom_images, key=get_z_position)
+        sorted_images = sorted(dicom_images, key=_get_z_position)
 
         # Calculate the spacing.
-        spacing = get_spacing(sorted_images)
+        spacing = _get_spacing(sorted_images)
             
         slices = []
         for dicom_image in sorted_images:
@@ -51,6 +54,6 @@ def read_dicom(file_path):
         return data, spacing
     else:
         dicom_image = dcmread(file_path)  # Read the image.
-        spacing = get_spacing([dicom_image])  # Calculate the spacing.
+        spacing = _get_spacing([dicom_image])  # Calculate the spacing.
         data = apply_rescale(dicom_image.pixel_array, dicom_image)  # Convert from stored pixel values to real values.
         return data, spacing
