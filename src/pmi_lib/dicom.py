@@ -11,38 +11,46 @@ def get_z_position(dicom_image):
 
 
 def get_spacing(dicom_list):
-    """
-    Returns the x and y (and z) spacing of the DICOM images in the list.
-    """
-    n = len(dicom_list)
-    dx, dy = dicom_list[0].PixelSpacing # get pixel spacing from the first image (same spacing for all)
+    n = len(dicom_list)  # The number of slices in the list.
+    dx, dy = dicom_list[0].PixelSpacing  # Read the X and Y pixel spacing from the first slice.
     
-    # Calculate the z spacing if there are multiple images (z_end - z_start) / (n - 1)
     if n > 1:
+        # There are multiple slices. Get the offset of the first and last slice, calculate the
+        # Euclidean distance, and divide it by n-1 to get the slice spacing.
         z_first = np.array(dicom_list[0].ImagePositionPatient)
         z_last = np.array(dicom_list[-1].ImagePositionPatient)
         dz = np.linalg.norm(z_last - z_first) / (n - 1)
         return [dx, dy, dz]
     else:
+        # There is just one slice. There is no slice spacing.
         return [dx, dy]
 
 
 def read_dicom(file_path):
-    """
-    Reads a DICOM file and returns the pixel data as a numpy array.
-    """
-    if os.path.isfile(file_path):
-        dicom_file = dcmread(file_path)  # Read the image.
-        dicom_array = dicom_file.pixel_array  # Get the pixel data.
-        dicom_image = apply_rescale(dicom_array, dicom_file)  # Apply rescale for HU.
-        spacing = get_spacing([dicom_file])  # Get the spacing.
-    elif os.path.isdir(file_path):
-        dicom_files = [dcmread(os.path.join(file_path, f)) for f in os.listdir(file_path)]
-        dicom_files.sort(key=get_z_position)  # Sort by z-position.
-        dicom_arrays = [f.pixel_array for f in dicom_files]  # Get the pixel data.
-        dicom_image = [apply_rescale(a, f) for a, f in zip(dicom_arrays, dicom_files)]  # Apply rescale for HU.
-        spacing = get_spacing(dicom_files)  # Get the spacing.
+    # Check if file_path is a directory. If it is, then iterate over the directory and create a 3d volume.
+    # If it is not a directory, then open the file as usual.
+    if os.path.isdir(file_path):
+        # Read all DICOM files.
+        dicom_images = []
+        for file_name in os.listdir(file_path):
+            full_path = os.path.join(file_path, file_name)
+            if os.path.isfile(full_path):
+                dicom_images.append(dcmread(full_path))  # Read the image.
+
+        # Sort the files on the Instance Number.
+        sorted_images = sorted(dicom_images, key=get_z_position)
+
+        # Calculate the spacing.
+        spacing = get_spacing(sorted_images)
+            
+        slices = []
+        for dicom_image in sorted_images:
+            slices.append(apply_rescale(dicom_image.pixel_array, dicom_image))  # Convert from stored pixel values to real values.
+        
+        data = np.array(slices)
+        return data, spacing
     else:
-        raise ValueError(f"Invalid file path: {file_path}")
-    
-    return np.array(dicom_image), spacing
+        dicom_image = dcmread(file_path)  # Read the image.
+        spacing = get_spacing([dicom_image])  # Calculate the spacing.
+        data = apply_rescale(dicom_image.pixel_array, dicom_image)  # Convert from stored pixel values to real values.
+        return data, spacing
