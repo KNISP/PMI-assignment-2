@@ -16,4 +16,4 @@ spacing (a sequence of floats), and a file path (a string). Raise a ValueError w
    spacing = tuple(spacing)
 
    if len(spacing) != data.ndim:
-       raise ValueError(f"Spacing length ({len(spacing)}) must match data dimensions ({data.ndim})")
+       raise ValueError("The arguments to write_nifti() are incompatible.")
