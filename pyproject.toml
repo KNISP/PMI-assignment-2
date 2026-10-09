@@ -11,7 +11,7 @@ requires-python = '>=3.14'
 license = 'MIT'
 license-files = ['LICENSE.md']
 authors = [
-  {Agata Leszczak = 'Group member 1', email = 'member1@students.uu.nl'},
+  {Agata Leszczak = 'Group member 1', email = 'a.k.leszczak@students.uu.nl'},
   {Luc Hampsink = 'Group member 2', email = 'member2@students.uu.nl'},
   {Nienke Metzger = 'Group member 3', email = 'member3@students.uu.nl'},
   {Jeannette Stepanyan = 'Group member 4', email = 'j.stepanyan@students.uu.nl'},
