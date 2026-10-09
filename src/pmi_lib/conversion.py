@@ -2,7 +2,11 @@ import nibabel as nib
 import numpy as np
 from dicom import read_dicom
 from nifti import write_nifti
+import click
 
+@click.command()
+@click.argument('dicom_path', type=click.Path(exists=True, file_okay=True), required=True)
+@click.argument('nifti_path', required=True)
 def dicom_to_nifti(dicom_path, nifti_path):
     """ converting single DICOM files or directories with DICOM files to a Nifti file."""
     

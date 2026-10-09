@@ -3,14 +3,14 @@ import numpy as np
 from pydicom import dcmread
 from pydicom.pixels import apply_rescale
 
-def get_z_position(dicom_image):
+def _get_z_position(dicom_image):
     """
     Returns the z-coordinate of the Image Position Patient DICOM attribute.
     """
     return dicom_image.ImagePositionPatient[2]
 
 
-def get_spacing(dicom_list):
+def _get_spacing(dicom_list):
     n = len(dicom_list)  # The number of slices in the list.
     dx, dy = dicom_list[0].PixelSpacing  # Read the X and Y pixel spacing from the first slice.
     
