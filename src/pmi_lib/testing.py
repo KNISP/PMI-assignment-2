@@ -1,7 +1,7 @@
 from dicom import read_dicom
 from conversion import dicom_to_nifti
 from nifti import read_nifti
-from filtering import masked_gaussian_filter
+from processing import masked_gaussian_filter
 
 def test(dicom_path, nifti_path):
     """Test the DICOM to Nifti conversion process."""
