@@ -6,7 +6,11 @@ setup.py
 pmi_lib.egg-info/PKG-INFO
 pmi_lib.egg-info/SOURCES.txt
 pmi_lib.egg-info/dependency_links.txt
+pmi_lib.egg-info/entry_points.txt
 pmi_lib.egg-info/requires.txt
 pmi_lib.egg-info/top_level.txt
 src/pmi_lib/__init__.py
-src/pmi_lib/__init__.py
+src/pmi_lib/cli.py
+src/pmi_lib/io.py
+src/pmi_lib/processing.py
+src/pmi_lib/testing.py

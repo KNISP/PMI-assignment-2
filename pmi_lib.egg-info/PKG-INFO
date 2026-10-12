@@ -1,8 +1,8 @@
 Metadata-Version: 2.4
 Name: pmi-lib
 Version: 0.0.1
-Summary: PMI library - Group <group number>
-Author-email: Group member 1 <member1@students.uu.nl>, Group member 2 <member2@students.uu.nl>, Group member 3 <member3@students.uu.nl>, Group member 4 <member4@students.uu.nl>
+Summary: PMI library - Group 5
+Author-email: Agata Leszczak <a.k.leszczak@students.uu.nl>, Luc Hampsink <member2@students.uu.nl>, Nienke Metzger <member3@students.uu.nl>, Jeannette Stepanyan <j.stepanyan@students.uu.nl>
 License-Expression: MIT
 Requires-Python: >=3.14
 Description-Content-Type: text/markdown
@@ -10,6 +10,8 @@ License-File: LICENSE.md
 Requires-Dist: nibabel
 Requires-Dist: numpy
 Requires-Dist: pydicom
+Requires-Dist: scipy
+Requires-Dist: click
 Dynamic: license-file
 
 # PMI lib

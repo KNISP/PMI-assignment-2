@@ -11,9 +11,12 @@ requires-python = '>=3.14'
 license = 'MIT'
 license-files = ['LICENSE.md']
 authors = [
-  {Agata Leszczak = 'Group member 1', email = 'a.k.leszczak@students.uu.nl'},
-  {Luc Hampsink = 'Group member 2', email = 'member2@students.uu.nl'},
-  {Nienke Metzger = 'Group member 3', email = 'member3@students.uu.nl'},
-  {Jeannette Stepanyan = 'Group member 4', email = 'j.stepanyan@students.uu.nl'},
+  {name = 'Agata Leszczak', email = 'a.k.leszczak@students.uu.nl'},
+  {name = 'Luc Hampsink', email = 'member2@students.uu.nl'},
+  {name = 'Nienke Metzger', email = 'member3@students.uu.nl'},
+  {name = 'Jeannette Stepanyan', email = 'j.stepanyan@students.uu.nl'},
 ]
-dependencies = ["nibabel", "numpy", "pydicom"]
+dependencies = ["nibabel", "numpy", "pydicom", "scipy", "click"]
+
+[project.scripts]
+dicom-to-nifti = "pmi_lib.cli:dicom_to_nifti"

@@ -1,50 +1,49 @@
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-def masked_gaussian_filter(pixel_data, bool_mask, sd):
-    # Use 32-bit floating point precision for the image and the mask.
+def masked_gaussian_filter(data, mask, std):
+    """
+    Apply a Gaussian filter to an image, but only within a specified mask.
     
+    :param data: 2D or 3D numpy array representing the image
+    :param mask: 2D or 3D boolean numpy array of the same shape as data, where True indicates the region to filter
+    :param std: standard deviation for Gaussian filter, can be a single float or a tuple for each dimension
+    :return: filtered image
+    """
+    # check if the inputs are of the correct type
+    if type(data) != np.ndarray:
+        raise ValueError(f"Data must be a numpy array, not a {type(data)}.")
 
-    # Error handling 
-    # als pixel data & bool mask niet even groot 
-    if np.shape(pixel_data) != np.shape(bool_mask):
-        raise ValueError("Image and mask shapes should be the same")
+    if type(mask) != np.ndarray:
+        raise ValueError(f"Mask must be a numpy array, not a {type(mask)}.")
+    if mask.dtype != bool:
+        raise ValueError(f"Mask must be a boolean array, not a {mask.dtype}.")
+
+    if type(std) != float and type(std) != tuple:
+        raise ValueError(f"Standard deviation must be a float or a tuple, not a {type(std)}.")
+
+    # check if mask is compatible with given data
+    if np.shape(data) != np.shape(mask):
+        raise ValueError(f"Data shape {np.shape(data)} does not match mask shape {np.shape(mask)}.")
+
+    # convert to 32-bit floating point precision
+    data = data.astype(np.float32)
+    mask = mask.astype(np.float32)
     
+    # mask the image (where mask is True keep data, else set to 0)
+    masked_image = mask * data
 
+    # apply gaussian filter to the masked image
+    gaus_filt_masked_img = gaussian_filter(masked_image, std)
 
-    # M×(G(M×I, σ) / G(M, σ))
-    gaus_filt = gaussian_filter(pixel_data, sd) #G(M, σ) - filtered
+    # apply gaussian filter to the mask
+    gaus_filt_mask = gaussian_filter(mask, std)
 
-    #add mask to image
-    masked_image = pixel_data.copy()
-    for i in range(len(pixel_data[0])):
-        for j in range(len(pixel_data[1])):
+    # normalize the filtered masked image
+    gaus_filt_norm_img = gaus_filt_masked_img / gaus_filt_mask
+    gaus_filt_norm_img = np.nan_to_num(gaus_filt_norm_img) # replace NaN with 0
 
-            if bool_mask[i, j] == False:
-                masked_image[i, j] = 0
+    # re-apply mask to the normalized filtered image (to zero out areas outside the mask)
+    mask_filt_img = mask * gaus_filt_norm_img
 
-    
-    mask_gaus_filt = gaussian_filter(masked_image, sd) / gaus_filt #(G(M×I, σ) / G(M, σ))
-    mask_gaus_filt = np.nan_to_num(mask_gaus_filt)
-
-
-    #Apply mask to masked_filt / filt 
-    for i in range(len(pixel_data[0])):
-            for j in range(len(pixel_data[1])):
-            
-                if bool_mask[i, j] == False:
-                    mask_gaus_filt[i, j] = 0
-
-    return mask_gaus_filt
-
-
-
-# Test data
-pixel_data = np.arange(50, step=2).reshape((5,5))
-bool_mask = np.ones((5, 5), dtype=bool)
-bool_mask[2] = [0,0,0,0,0]
-sd = 3
-
-masked_gaussian_filter(pixel_data, bool_mask, sd)
-
-
+    return mask_filt_img

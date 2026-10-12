@@ -1,23 +1,30 @@
-from dicom import read_dicom
-from conversion import dicom_to_nifti
-from nifti import read_nifti
-from processing import masked_gaussian_filter
+from .io import read_dicom, read_nifti
+from .cli import dicom_to_nifti
+from .processing import masked_gaussian_filter
 
-def test(dicom_path, nifti_path):
-    """Test the DICOM to Nifti conversion process."""
-    dicom_data, dicom_spacing = read_dicom(dicom_path)
-    print(f"Done reading DICOM files: shape={dicom_data.shape}, spacing={dicom_spacing}")
+def test(file_path):
+    """
+    Test the functions in the pmi_lib module.
 
-    dicom_to_nifti(dicom_path, nifti_path)
-    print("Done converting to Nifti")
+    :param file_path: path to the DICOM file or directory
+    """
+    # read DICOM files
+    dcm_img, dcm_spacing = read_dicom(file_path)
+    print(f"1. read_dicom executed successfully: shape={dcm_img.shape}, spacing={dcm_spacing} \\n")
 
-    nifti_data, nifti_spacing = read_nifti(nifti_path)
-    print(f"Done reading Nifti file: shape={nifti_data.shape}, spacing={nifti_spacing}")
+    # convert DICOM to NIfTI
+    nii_path = "test_output.nii.gz"
+    dicom_to_nifti.callback(file_path, nii_path) # uses write_nifti internally, callback handles click decorator
+    print(f"2. dicom_to_nifti & write_nifti executed successfully: output file={nii_path}\\n")
 
-    mask = dicom_data > 0  # Create a mask for non-zero values.
-    std = 1.0  # Standard deviation for the Gaussian filter.
+    # read NIfTI file
+    nii_img, nii_spacing = read_nifti(nii_path)
+    print(f"3. read_nifti executed successfully: shape={nii_img.shape}, spacing={nii_spacing}\\n")
 
-    filtered_data = masked_gaussian_filter(dicom_data, mask, std)
-    print(f"Done filtering: shape={filtered_data.shape}")
+    # apply masked Gaussian filter
+    mask = dcm_img > 0
+    std = tuple(0.8 for _ in range(dcm_img.ndim))
+    mask_filt_img = masked_gaussian_filter(dcm_img, mask, std)
+    print(f"4. masked_gaussian_filter executed successfully: shape={mask_filt_img.shape}\\n")
 
-    print("Done testing")
+    print(f"--> all tests passed successfully! (do not forget to delete the {nii_path} file when you're done)")
