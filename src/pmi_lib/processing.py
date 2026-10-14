@@ -41,7 +41,7 @@ def masked_gaussian_filter(data, mask, std):
 
     # normalize the filtered masked image
     gaus_filt_norm_img = gaus_filt_masked_img / gaus_filt_mask
-    gaus_filt_norm_img = np.nan_to_num(gaus_filt_norm_img) # replace NaN with 0
+    gaus_filt_norm_img = np.nan_to_num(gaus_filt_norm_img, nan=0.0) # replace NaN with 0
 
     # re-apply mask to the normalized filtered image (to zero out areas outside the mask)
     mask_filt_img = mask * gaus_filt_norm_img
