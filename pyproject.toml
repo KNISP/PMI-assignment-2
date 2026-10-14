@@ -18,5 +18,8 @@ authors = [
 ]
 dependencies = ["nibabel", "numpy", "pydicom", "scipy", "click"]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [project.scripts]
 dicom-to-nifti = "pmi_lib.cli:dicom_to_nifti"

@@ -1,34 +1,72 @@
-# PMI lib
+# PMI Library - group 5
 
-This is the project template for the library that you will build during the group assignments.
+`pmi-lib` is a small Python library for reading medical images, converting
+DICOM data to NIfTI, and applying masked Gaussian filtering.
 
+## Functions
 
-## Project Template Layout
+- Read a single DICOM file or a directory containing one DICOM series.
+- Read a NIfTI file.
+- Write a NIfTI file.
+- Convert DICOM files or directories to NIfTI (from the command line).
+- Apply a Gaussian filter (inside a boolean mask).
+- Test the full pipeline.
 
-This project template contains a directory `src/pmi_lib/`. This directory is the actual Python package, in which you'll be adding new modules.
+## Requirements
 
-The file `pyproject.toml` is the project configuration. It contains e.g. information about the package, about the dependencies, and about the authors. You'll need to make some changes in here.
+- Python 3.14 (or newer)
+- NumPy
+- SciPy
+- pydicom
+- NiBabel
+- Click
 
-`README.md` is this file. Replace all this information and describe your library. A Markdown file (`.md`) is a text file with a simple [markup syntax](https://www.markdownguide.org/basic-syntax/).
+## Installation
 
-The files `setup.py` and `MANIFEST.in` should **not** be changed. The file `setup.py` is a script for building code that we'll add in the second group assignment.
+From the project directory, install the package:
 
-Finally, `LICENSE.md` contains the license. It contains the terms of use for this template.
-
+```bash
+python -m pip install -e .
 ```
-project/
+
+This installs the `pmi_lib` package and the `dicom-to-nifti` command-line
+executable. You can then convert DICOM images into NIfTI images from your
+terminal.
+
+## Command-line usage
+
+Convert a DICOM file or directory to a NIfTI file:
+
+```bash
+dicom-to-nifti path/to/input.dcm path/to/output.nii.gz
+```
+
+The input may also be a directory containing DICOM slices:
+
+```bash
+dicom-to-nifti path/to/dicom_directory path/to/output.nii.gz
+```
+
+Use the help option to see the command arguments:
+
+```bash
+dicom-to-nifti --help
+```
+
+## Folder structure
+
+```text
+PMI-assignment-2/
 ├── src/
 │   └── pmi_lib/
 │       ├── __init__.py
-│       └── ...
+│       ├── cli.py
+│       ├── io.py
+│       ├── processing.py
+│       └── testing.py
 ├── pyproject.toml
 ├── README.md
 ├── setup.py
 ├── MANIFEST.in
 └── LICENSE.md
 ```
-
-
-## License
-
-`pmi-lib` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
