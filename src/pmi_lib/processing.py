@@ -1,15 +1,20 @@
 import numpy as np
 from scipy.ndimage import gaussian_filter
+from classes import Image
 
-def masked_gaussian_filter(data, mask, std):
+def masked_gaussian_filter(image: Image, mask: np.ndarray, std: float | tuple) -> Image:
     """
     Apply a Gaussian filter to an image, but only within a specified mask.
     
     :param data: 2D or 3D numpy array representing the image
     :param mask: 2D or 3D boolean numpy array of the same shape as data, where True indicates the region to filter
     :param std: standard deviation for Gaussian filter, can be a single float or a tuple for each dimension
-    :return: filtered image
+    :return: a new Image object with the filtered image data
     """
+    # extract data and spacing from the Image object
+    data = image.data
+    spacing = image.spacing
+
     # check if the inputs are of the correct type
     if type(data) != np.ndarray:
         raise ValueError(f"Data must be a numpy array, not a {type(data)}.")
@@ -34,7 +39,8 @@ def masked_gaussian_filter(data, mask, std):
     masked_image = mask * data
 
     # apply gaussian filter to the masked image
-    gaus_filt_masked_img = gaussian_filter(masked_image, std)
+    std_pixels = std / spacing  # convert std from mm to pixels
+    gaus_filt_masked_img = gaussian_filter(masked_image, std_pixels)
 
     # apply gaussian filter to the mask
     gaus_filt_mask = gaussian_filter(mask, std)
@@ -46,4 +52,4 @@ def masked_gaussian_filter(data, mask, std):
     # re-apply mask to the normalized filtered image (to zero out areas outside the mask)
     mask_filt_img = mask * gaus_filt_norm_img
 
-    return mask_filt_img
+    return Image(mask_filt_img) # no spacing, uses default

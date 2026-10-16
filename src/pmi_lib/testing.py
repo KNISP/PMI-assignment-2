@@ -2,7 +2,7 @@ from .io import read_dicom, read_nifti
 from .cli import dicom_to_nifti
 from .processing import masked_gaussian_filter
 
-def test(file_path):
+def test(file_path: str):
     """
     Test the functions in the pmi_lib module.
 

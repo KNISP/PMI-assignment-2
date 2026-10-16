@@ -2,15 +2,17 @@ import os
 import nibabel as nib
 import numpy as np
 from pydicom import dcmread
+import pydicom
 from pydicom.pixels import apply_rescale
+from classes import Image, DicomImage
 
 
-def read_dicom(file_path):
+def read_dicom(file_path: str) -> DicomImage:
     """
     Read a DICOM file or directory of DICOM files.
 
     :param file_path: path to the DICOM file or directory
-    :return: a tuple of the image (array) and spacing (tuple)
+    :return: a DicomImage object containing the image data, metadata, and spacing
     """
     # check if the file or directory exists
     if not os.path.exists(file_path):
@@ -44,7 +46,13 @@ def read_dicom(file_path):
         dcm_img = np.array(slices)
         spacing = tuple(spacing)
 
-        return dcm_img, spacing
+        metadata = {
+            elem.keyword: elem.value 
+            for elem in slice_img
+            if elem.keyword and elem.keyword != "PixelData"
+        }
+
+        return DicomImage(dcm_img, metadata, spacing)
     
     # check if the path is a file
     elif os.path.isfile(file_path):
@@ -57,16 +65,22 @@ def read_dicom(file_path):
 
         # convert from stored pixel values to real values (array)
         dcm_img = apply_rescale(dicom_image.pixel_array, dicom_image)
+
+        metadata = {
+            elem.keyword: elem.value 
+            for elem in dicom_image 
+            if elem.keyword and elem.keyword != "PixelData"
+        }
         
-        return dcm_img, spacing
+        return DicomImage(dcm_img, metadata, spacing)
 
 
-def read_nifti(file_path):
+def read_nifti(file_path: str) -> Image:
     """
     Read a NIfTI file.
 
     :param file_path: path to the NIfTI file
-    :return: a tuple of the image (array) and spacing (tuple)
+    :return: an Image object containing the image data and spacing
     """
     # check if the file exists
     if not os.path.exists(file_path):
@@ -85,10 +99,10 @@ def read_nifti(file_path):
     # get the spacing from the header
     spacing = nifti_image.header.get_zooms()
     
-    return nii_img, spacing
+    return Image(nii_img, spacing)
 
 
-def write_nifti(data, spacing, file_path):
+def write_nifti(data: np.ndarray, spacing: tuple[float, ...], file_path: str):
     """
     Write a NIfTI file.
     
@@ -117,7 +131,7 @@ def write_nifti(data, spacing, file_path):
     nib.nifti1.save(nii_image, file_path)
 
 
-def _get_z_position(dicom_image):
+def _get_z_position(dicom_image: pydicom.dataset.Dataset) -> float:
     """
     Get the Z position of a DICOM image.
 
@@ -127,7 +141,8 @@ def _get_z_position(dicom_image):
     return dicom_image.ImagePositionPatient[2]
 
 
-def _get_spacing(dicom_list):
+
+def _get_spacing(dicom_list: list[pydicom.dataset.Dataset]) -> list[float]:
     """
     Get the spacing of a list of DICOM images.
 

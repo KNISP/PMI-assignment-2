@@ -5,7 +5,7 @@ import click
 @click.command()
 @click.argument('dicom_path', type=click.Path(exists=True, file_okay=True), required=True)
 @click.argument('nifti_path', required=True)
-def dicom_to_nifti(dicom_path, nifti_path):
+def dicom_to_nifti(dicom_path: str, nifti_path: str):
     """
     Convert a DICOM file or directory to a NIfTI file.
 
