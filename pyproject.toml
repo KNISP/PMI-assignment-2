@@ -12,7 +12,7 @@ license = 'MIT'
 license-files = ['LICENSE.md']
 authors = [
   {name = 'Agata Leszczak', email = 'a.k.leszczak@students.uu.nl'},
-  {name = 'Luc Hampsink', email = 'member2@students.uu.nl'},
+  {name = 'Luc Hampsink', email = 'l.hampsink@students.uu.nl'},
   {name = 'Nienke Metzger', email = 'member3@students.uu.nl'},
   {name = 'Jeannette Stepanyan', email = 'j.stepanyan@students.uu.nl'},
 ]
