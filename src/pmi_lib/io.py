@@ -4,8 +4,7 @@ import numpy as np
 from pydicom import dcmread
 import pydicom
 from pydicom.pixels import apply_rescale
-from classes import Image, DicomImage
-
+from .classes import Image, DicomImage
 
 def read_dicom(file_path: str) -> DicomImage:
     """
@@ -46,6 +45,7 @@ def read_dicom(file_path: str) -> DicomImage:
         dcm_img = np.array(slices)
         spacing = tuple(spacing)
 
+        # build metadata from the DICOM dataset, excluding the pixel data itself
         metadata = {
             elem.keyword: elem.value 
             for elem in slice_img
@@ -66,6 +66,7 @@ def read_dicom(file_path: str) -> DicomImage:
         # convert from stored pixel values to real values (array)
         dcm_img = apply_rescale(dicom_image.pixel_array, dicom_image)
 
+        # build metadata from the DICOM dataset, excluding the pixel data itself
         metadata = {
             elem.keyword: elem.value 
             for elem in dicom_image 
@@ -102,7 +103,7 @@ def read_nifti(file_path: str) -> Image:
     return Image(nii_img, spacing)
 
 
-def write_nifti(data: np.ndarray, spacing: tuple[float, ...], file_path: str):
+def write_nifti(image: Image, file_path: str) -> None:
     """
     Write a NIfTI file.
     
@@ -110,7 +111,8 @@ def write_nifti(data: np.ndarray, spacing: tuple[float, ...], file_path: str):
     :param spacing: voxel spacing
     :param file_path: path to save the NIfTI file"""
     # convert data to array
-    data = np.array(data)
+    data = np.array(image._data)
+    spacing = image.spacing
 
     # NIfTI does not support 'bool' datatype, convert it to uint8
     if data.dtype == bool:
@@ -139,7 +141,6 @@ def _get_z_position(dicom_image: pydicom.dataset.Dataset) -> float:
     :return: the Z position of the image
     """
     return dicom_image.ImagePositionPatient[2]
-
 
 
 def _get_spacing(dicom_list: list[pydicom.dataset.Dataset]) -> list[float]:

@@ -1,11 +1,12 @@
 import numpy as np
 from .io import read_dicom, write_nifti
+from .classes import Image
 import click
 
 @click.command()
 @click.argument('dicom_path', type=click.Path(exists=True, file_okay=True), required=True)
 @click.argument('nifti_path', required=True)
-def dicom_to_nifti(dicom_path: str, nifti_path: str):
+def dicom_to_nifti(dicom_path: str, nifti_path: str) -> None:
     """
     Convert a DICOM file or directory to a NIfTI file.
 
@@ -14,7 +15,9 @@ def dicom_to_nifti(dicom_path: str, nifti_path: str):
     """
     # don't bother CLI users with python exceptions
     try:
-        dcm_img, spacing = read_dicom(dicom_path)
+        dcm_image = read_dicom(dicom_path)
+        dcm_img = dcm_image._data
+        spacing = dcm_image.spacing
     except (FileNotFoundError, ValueError) as error:
         raise click.ClickException(error)
     except Exception:
@@ -28,7 +31,7 @@ def dicom_to_nifti(dicom_path: str, nifti_path: str):
         raise click.ClickException("An unexpected error occurred while converting the DICOM input.")
 
     try:
-        write_nifti(nii_img, spacing, nifti_path)
+        write_nifti(Image(nii_img, spacing), nifti_path)
     except ValueError as error:
         raise click.ClickException(error)
     except Exception:

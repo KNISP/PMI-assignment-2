@@ -1,18 +1,18 @@
 import numpy as np
 from scipy.ndimage import gaussian_filter
-from classes import Image
+from .classes import Image
 
-def masked_gaussian_filter(image: Image, mask: np.ndarray, std: float | tuple) -> Image:
+def masked_gaussian_filter(image: Image, mask: np.ndarray, std: float | tuple[float, ...]) -> Image:
     """
     Apply a Gaussian filter to an image, but only within a specified mask.
     
     :param data: 2D or 3D numpy array representing the image
     :param mask: 2D or 3D boolean numpy array of the same shape as data, where True indicates the region to filter
-    :param std: standard deviation for Gaussian filter, can be a single float or a tuple for each dimension
+    :param std: standard deviation for Gaussian filter, can be a single float or a tuple for each dimension in mm
     :return: a new Image object with the filtered image data
     """
     # extract data and spacing from the Image object
-    data = image.data
+    data = image._data
     spacing = image.spacing
 
     # check if the inputs are of the correct type
@@ -39,11 +39,11 @@ def masked_gaussian_filter(image: Image, mask: np.ndarray, std: float | tuple) -
     masked_image = mask * data
 
     # apply gaussian filter to the masked image
-    std_pixels = std / spacing  # convert std from mm to pixels
+    std_pixels = tuple(np.asarray(std) / np.asarray(spacing))  # convert std from mm to pixels
     gaus_filt_masked_img = gaussian_filter(masked_image, std_pixels)
 
     # apply gaussian filter to the mask
-    gaus_filt_mask = gaussian_filter(mask, std)
+    gaus_filt_mask = gaussian_filter(mask, std_pixels)
 
     # normalize the filtered masked image
     gaus_filt_norm_img = gaus_filt_masked_img / gaus_filt_mask
@@ -52,4 +52,4 @@ def masked_gaussian_filter(image: Image, mask: np.ndarray, std: float | tuple) -
     # re-apply mask to the normalized filtered image (to zero out areas outside the mask)
     mask_filt_img = mask * gaus_filt_norm_img
 
-    return Image(mask_filt_img) # no spacing, uses default
+    return Image(mask_filt_img, spacing)
