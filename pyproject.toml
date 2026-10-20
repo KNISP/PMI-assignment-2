@@ -13,7 +13,7 @@ license-files = ['LICENSE.md']
 authors = [
   {name = 'Agata Leszczak', email = 'a.k.leszczak@students.uu.nl'},
   {name = 'Luc Hampsink', email = 'l.hampsink@students.uu.nl'},
-  {name = 'Nienke Metzger', email = 'member3@students.uu.nl'},
+  {name = 'Nienke Metzger', email = 'n.metzger@students.uu.nl'},
   {name = 'Jeannette Stepanyan', email = 'j.stepanyan@students.uu.nl'},
 ]
 dependencies = ["nibabel", "numpy", "pydicom", "scipy", "click"]
