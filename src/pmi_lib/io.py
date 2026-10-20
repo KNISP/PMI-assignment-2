@@ -1,10 +1,13 @@
 import os
+
 import nibabel as nib
 import numpy as np
-from pydicom import dcmread
 import pydicom
+from pydicom import dcmread
 from pydicom.pixels import apply_rescale
-from .classes import Image, DicomImage
+
+from .classes import DicomImage, Image
+
 
 def read_dicom(file_path: str) -> DicomImage:
     """
@@ -16,7 +19,7 @@ def read_dicom(file_path: str) -> DicomImage:
     # check if the file or directory exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"The file or directory {file_path} does not exist.")
-    
+
     # check if the path is a directory
     elif os.path.isdir(file_path):
         dicom_images = []
@@ -26,8 +29,13 @@ def read_dicom(file_path: str) -> DicomImage:
             if os.path.isfile(full_path):
                 slice_img = dcmread(full_path)
                 # check if Series Instance UID of current DICOM matches that of first file
-                if len(dicom_images) != 0 and slice_img.SeriesInstanceUID != dicom_images[0].SeriesInstanceUID:
-                    raise ValueError(f"DICOM file {file_name} has a different Series Instance UID than the first file/other files.")
+                if (
+                    len(dicom_images) != 0
+                    and slice_img.SeriesInstanceUID != dicom_images[0].SeriesInstanceUID
+                ):
+                    raise ValueError(
+                        f"DICOM file {file_name} has a different Series Instance UID than the first file/other files."
+                    )
                 dicom_images.append(slice_img)
 
         # sort the files by spatial position
@@ -47,13 +55,13 @@ def read_dicom(file_path: str) -> DicomImage:
 
         # build metadata from the DICOM dataset, excluding the pixel data itself
         metadata = {
-            elem.keyword: elem.value 
+            elem.keyword: elem.value
             for elem in slice_img
             if elem.keyword and elem.keyword != "PixelData"
         }
 
         return DicomImage(dcm_img, metadata, spacing)
-    
+
     # check if the path is a file
     elif os.path.isfile(file_path):
         # read the DICOM file
@@ -68,11 +76,11 @@ def read_dicom(file_path: str) -> DicomImage:
 
         # build metadata from the DICOM dataset, excluding the pixel data itself
         metadata = {
-            elem.keyword: elem.value 
-            for elem in dicom_image 
+            elem.keyword: elem.value
+            for elem in dicom_image
             if elem.keyword and elem.keyword != "PixelData"
         }
-        
+
         return DicomImage(dcm_img, metadata, spacing)
 
 
@@ -86,7 +94,7 @@ def read_nifti(file_path: str) -> Image:
     # check if the file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"The file or directory {file_path} does not exist.")
-    
+
     # read the image
     nifti_image = nib.load(file_path)
 
@@ -96,17 +104,17 @@ def read_nifti(file_path: str) -> Image:
     # convert from column-major (XYZ) to row-major ordering (ZYX) and from RAS to LPS orientation (mirror Y and X)
     nii_img = np.transpose(data)
     nii_img = np.flip(nii_img, (-1, -2))
-    
+
     # get the spacing from the header
     spacing = nifti_image.header.get_zooms()
-    
+
     return Image(nii_img, spacing)
 
 
 def write_nifti(image: Image, file_path: str) -> None:
     """
     Write a NIfTI file.
-    
+
     :param data: image data
     :param spacing: voxel spacing
     :param file_path: path to save the NIfTI file"""
@@ -120,13 +128,15 @@ def write_nifti(image: Image, file_path: str) -> None:
 
     # check if spacing is compatible with given data
     if len(spacing) != data.ndim:
-        raise ValueError(f"Spacing length {len(spacing)} does not match data dimensions {data.ndim}.")
+        raise ValueError(
+            f"Spacing length {len(spacing)} does not match data dimensions {data.ndim}."
+        )
 
     # construct an affine transformation matrix (matrix with spacing on diagonal)
     affine = np.eye(4)
     for i, s in enumerate(spacing):
         affine[i, i] = s
-    
+
     # create a nifti image and save it
     nii_image = nib.nifti1.Nifti1Image(data, affine)
 
@@ -150,15 +160,15 @@ def _get_spacing(dicom_list: list[pydicom.dataset.Dataset]) -> list[float]:
     :param dicom_list: a list of DICOM images
     :return: a list of spacing values [dx, dy, dz]
     """
-    n = len(dicom_list) # number of slices
-    dx, dy = dicom_list[0].PixelSpacing # x, y pixel spacing
+    n = len(dicom_list)  # number of slices
+    dx, dy = dicom_list[0].PixelSpacing  # x, y pixel spacing
 
     # check if there are multiple slices
     if n > 1:
         # calculate z spacing as total distance / number of slices
-        z_first = np.array(dicom_list[0].ImagePositionPatient) # first slice position
-        z_last = np.array(dicom_list[-1].ImagePositionPatient) # last slice position
-        dz = np.linalg.norm(z_last - z_first) / (n - 1)        # z spacing
+        z_first = np.array(dicom_list[0].ImagePositionPatient)  # first slice position
+        z_last = np.array(dicom_list[-1].ImagePositionPatient)  # last slice position
+        dz = np.linalg.norm(z_last - z_first) / (n - 1)  # z spacing
         return [dx, dy, dz]
     else:
         # there is just one slice, so no slice spacing

@@ -1,11 +1,15 @@
-import numpy as np
-from .io import read_dicom, write_nifti
-from .classes import Image
 import click
+import numpy as np
+
+from .classes import Image
+from .io import read_dicom, write_nifti
+
 
 @click.command()
-@click.argument('dicom_path', type=click.Path(exists=True, file_okay=True), required=True)
-@click.argument('nifti_path', required=True)
+@click.argument(
+    "dicom_path", type=click.Path(exists=True, file_okay=True), required=True
+)
+@click.argument("nifti_path", required=True)
 def dicom_to_nifti(dicom_path: str, nifti_path: str) -> None:
     """
     Convert a DICOM file or directory to a NIfTI file.
@@ -20,19 +24,25 @@ def dicom_to_nifti(dicom_path: str, nifti_path: str) -> None:
         spacing = dcm_image.spacing
     except (FileNotFoundError, ValueError) as error:
         raise click.ClickException(error)
-    except Exception:
-        raise click.ClickException("An unexpected error occurred while reading the DICOM input.")
+    except Exception:  # noqa: BLE001
+        raise click.ClickException(
+            "An unexpected error occurred while reading the DICOM input."
+        )
 
     try:
         # convert from LPS to RAS orientation (mirror Y and X) and from row-major (ZYX) to column-major (XYZ) order
         data = np.flip(dcm_img, (-1, -2))
         nii_img = np.transpose(data)
-    except Exception:
-        raise click.ClickException("An unexpected error occurred while converting the DICOM input.")
+    except Exception:  # noqa: BLE001
+        raise click.ClickException(
+            "An unexpected error occurred while converting the DICOM input."
+        )
 
     try:
         write_nifti(Image(nii_img, spacing), nifti_path)
     except ValueError as error:
         raise click.ClickException(error)
-    except Exception:
-        raise click.ClickException("An unexpected error occurred while writing the NIfTI output.")
+    except Exception:  # noqa: BLE001
+        raise click.ClickException(
+            "An unexpected error occurred while writing the NIfTI output."
+        )

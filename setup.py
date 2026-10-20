@@ -2,15 +2,13 @@ import platform
 import shutil
 import subprocess
 import sys
-
 from pathlib import Path
 
 from setuptools import Command, setup
+from setuptools.command.bdist_wheel import bdist_wheel
 from setuptools.command.build_py import build_py
 from setuptools.command.editable_wheel import editable_wheel
-from setuptools.command.bdist_wheel import bdist_wheel
 from setuptools.errors import SetupError  # Prints nicely without traceback
-
 
 # ANSI markup escape sequences.
 BOLD = "\033[1m"
@@ -45,7 +43,7 @@ def _get_input_files():
 # BuildNative.run() is executed when
 class BuildNative(Command):
     description = "compile the native library"
-    user_options = []
+    user_options = []  # noqa: RUF012
 
     def initialize_options(self):
         pass
@@ -69,10 +67,20 @@ class BuildNative(Command):
                 help = HELP_DARWIN
             else:  # Linux / Unix
                 help = HELP_UNIX
-            raise SetupError(f"{BOLD}GCC was not found.{RESET} Please install it first:\n" + help)
+            raise SetupError(
+                f"{BOLD}GCC was not found.{RESET} Please install it first:\n" + help
+            )
 
         # Set common build arguments.
-        build_args = ['-shared', '-O2', '-Wall', '-Wextra', '-Werror', '--std=c99', '-fdiagnostics-color=always']
+        build_args = [
+            "-shared",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "--std=c99",
+            "-fdiagnostics-color=always",
+        ]
 
         # Set platform specific build arguments.
         if platform.system() == "Windows":
@@ -86,7 +94,7 @@ class BuildNative(Command):
             cmd = ["gcc", *build_args, "-fPIC", "-o", str(output_file), *input_files]
 
         # Run the build command. Raise an error when it fails.
-        result = subprocess.run(cmd, stdout=sys.stdout, stderr=sys.stderr)
+        result = subprocess.run(cmd, stdout=sys.stdout, stderr=sys.stderr)  # noqa: PLW1510
         if result.returncode != 0:
             raise SetupError(f"{BOLD}Failed to compile source file(s){RESET}")
 
@@ -102,7 +110,11 @@ class BuildPy(build_py):
 class BdistWheel(bdist_wheel):
     def get_tag(self):
         _, _, platform = super().get_tag()
-        return "py3", "none", platform  # Our native libraries do not depend on a specific Python version.
+        return (
+            "py3",
+            "none",
+            platform,
+        )  # Our native libraries do not depend on a specific Python version.
 
 
 # EditableWheel is used for editable installs (python -m pip install -e .).
