@@ -28,6 +28,7 @@ Options:
 
 
 **Used arguments**
+
 dicom_path -> DICOM_PATH can be a single DICOM file or a directory containing one DICOM series.
 nifti_path -> NIFTI_PATH is the path for the output NIfTI file.
 
