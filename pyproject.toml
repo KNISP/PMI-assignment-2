@@ -16,7 +16,7 @@ authors = [
   {name = 'Nienke Metzger', email = 'n.metzger@students.uu.nl'},
   {name = 'Jeannette Stepanyan', email = 'j.stepanyan@students.uu.nl'},
 ]
-dependencies = ["nibabel", "numpy", "pydicom", "scipy", "click"]
+dependencies = ["nibabel", "numpy", "pydicom", "scipy", "click", "pylibjpeg", "pylibjpeg-libjpeg"]
 
 [project.scripts]
 dicom-to-nifti = "pmi_lib.cli:dicom_to_nifti"
