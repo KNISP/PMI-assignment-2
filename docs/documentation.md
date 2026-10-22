@@ -26,19 +26,6 @@ Options:
 ## FUNCTIONS
 ### `dicom_to_nifti(dicom_path:str,nifti_path:str)`
 
-Convert DICOM to NIfTI from the command line
-In the terminal type: dicom-to-nifti --help
-This will result in:
-Usage: dicom-to-nifti [OPTIONS] DICOM_PATH NIFTI_PATH
-
-  Convert a DICOM file or directory to a NIfTI file.
-
-  :param dicom_path: path to the DICOM file or directory
-  :param nifti_path:  path to the output NIfTI file
-
-Options:
-  --help  Show this message and exit.
-
 
 **Used arguments**
 dicom_path -> DICOM_PATH can be a single DICOM file or a directory containing one DICOM series.
