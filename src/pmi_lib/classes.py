@@ -96,8 +96,8 @@ class Image:
         """
         if self._data.ndim < 3:
             raise ValueError("Data must be at least 3D to calculate voxel volume.")
-
-        return self.spacing[0] * self.spacing[1] * self.spacing[2]
+        else:
+            return self.spacing[0] * self.spacing[1] * self.spacing[2]
 
 
 class DicomImage(Image):
