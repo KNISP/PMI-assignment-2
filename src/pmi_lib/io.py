@@ -169,7 +169,7 @@ def _get_spacing(dicom_list: list[pydicom.dataset.Dataset]) -> list[float]:
         z_first = np.array(dicom_list[0].ImagePositionPatient)  # first slice position
         z_last = np.array(dicom_list[-1].ImagePositionPatient)  # last slice position
         dz = np.linalg.norm(z_last - z_first) / (n - 1)  # z spacing
-        return [dx, dy, dz]
+        return [dz, dx, dy]
     else:
         # there is just one slice, so no slice spacing
         return [dx, dy]
